@@ -8,6 +8,9 @@
 - ↑ / ↓ / Tab 在货币之间切换，Esc 清空
 - 窗口可置顶，记住上次的货币列表、金额和窗口位置
 - 启动时自动获取最新汇率，之后每 30 分钟检查一次；断网时使用上次缓存的汇率
+<img width="582" height="891" alt="image" src="https://github.com/user-attachments/assets/b67fe638-19c2-4c95-84bb-bc7851a10cbc" />
+
+
 
 ## 运行
 
