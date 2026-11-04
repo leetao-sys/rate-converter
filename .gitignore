@@ -1,2 +1,4 @@
 dist/
 *.pdb
+ios/*.xcodeproj/
+ios/build/

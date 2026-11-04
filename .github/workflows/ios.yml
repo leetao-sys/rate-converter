@@ -1,0 +1,59 @@
+# 在 GitHub 的云端 Mac 上编译 iOS 版，无需自己有 Mac
+# 产物：未签名的 RateConverter-unsigned.ipa（用 Sideloadly / 爱思助手等工具签名后安装）
+name: iOS build
+
+on:
+  push:
+    branches: [main]
+    tags: ["ios-v*"]
+    paths: ["ios/**", ".github/workflows/ios.yml"]
+  pull_request:
+    paths: ["ios/**", ".github/workflows/ios.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: macos-15
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: ios
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate Xcode project
+        run: |
+          brew install xcodegen
+          xcodegen generate
+
+      - name: Run unit tests
+        run: |
+          UDID=$(xcrun simctl list devices available -j | python3 -c "import json,sys; d=json.load(sys.stdin)['devices']; print(next(x['udid'] for k in sorted(d, reverse=True) if 'iOS' in k for x in d[k] if x['name'].startswith('iPhone')))")
+          echo "Simulator: $UDID"
+          xcodebuild test -project RateConverter.xcodeproj -scheme RateConverter \
+            -destination "id=$UDID" -quiet
+
+      - name: Build unsigned IPA
+        run: |
+          xcodebuild build -project RateConverter.xcodeproj -scheme RateConverter \
+            -configuration Release -sdk iphoneos -destination 'generic/platform=iOS' \
+            -derivedDataPath build -quiet \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY=""
+          mkdir -p build/ipa/Payload
+          cp -R build/Build/Products/Release-iphoneos/RateConverter.app build/ipa/Payload/
+          (cd build/ipa && zip -qry ../../RateConverter-unsigned.ipa Payload)
+          ls -lh RateConverter-unsigned.ipa
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: RateConverter-unsigned-ipa
+          path: ios/RateConverter-unsigned.ipa
+
+      - name: Publish release
+        if: startsWith(github.ref, 'refs/tags/ios-v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ios/RateConverter-unsigned.ipa

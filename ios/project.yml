@@ -1,0 +1,52 @@
+# XcodeGen 配置：在 macOS 上运行 `xcodegen generate` 生成 RateConverter.xcodeproj
+name: RateConverter
+options:
+  bundleIdPrefix: io.github.leetaosys
+  deploymentTarget:
+    iOS: "16.0"
+  createIntermediateGroups: true
+  developmentLanguage: zh-Hans
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    MARKETING_VERSION: "1.0.0"
+    CURRENT_PROJECT_VERSION: "1"
+targets:
+  RateConverter:
+    type: application
+    platform: iOS
+    sources:
+      - RateConverter
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: io.github.leetaosys.rateconverter
+        PRODUCT_NAME: RateConverter
+        INFOPLIST_KEY_CFBundleDisplayName: 汇率换算
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone: UIInterfaceOrientationPortrait
+        INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad: "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"
+        INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.finance
+        INFOPLIST_KEY_ITSAppUsesNonExemptEncryption: NO
+        GENERATE_INFOPLIST_FILE: YES
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        TARGETED_DEVICE_FAMILY: "1,2"
+  RateConverterTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - RateConverterTests
+    dependencies:
+      - target: RateConverter
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+        PRODUCT_BUNDLE_IDENTIFIER: io.github.leetaosys.rateconverter.tests
+schemes:
+  RateConverter:
+    build:
+      targets:
+        RateConverter: all
+    test:
+      targets:
+        - RateConverterTests
